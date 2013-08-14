@@ -1,12 +1,18 @@
 package com.spine.attachments;
 
-import org.andengine.entity.sprite.batch.SpriteBatch;
 
-import com.MathUtils;
+import com.badlogic.gdx.utils.MathUtils;
 import com.spine.Attachment;
 import com.spine.Bone;
 import com.spine.Slot;
 
+import org.andengine.entity.IEntity;
+import org.andengine.entity.sprite.batch.SpriteBatch;
+
+import org.andengine.util.adt.color.Color;
+
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.MathUtils;
 /** Attachment that displays a texture region. */
 public class RegionAttachment extends Attachment	
 {
@@ -113,7 +119,7 @@ public class RegionAttachment extends Attachment
 			vertices[U3] = pRegion.getU2();
 			vertices[V3] = pRegion.getV();
 			vertices[U4] = pRegion.getU2();
-			vertices[V4] = pRegion.getV2();
+			vertices[V4] = pRegion.getV2();	
 		}
 		updateOffset();
 	}
@@ -125,8 +131,7 @@ public class RegionAttachment extends Attachment
 
 	public void draw (SpriteBatch batch, Slot slot) {
 		if (region == null) throw new IllegalStateException("RegionAttachment is not resolved: " + this);
-//		Color skeletonColor = slot.getSkeleton().getColor();
-//		Color slotColor = slot.getColor();
+		Color slotColor = slot.getColor();
 //		float color = NumberUtils.intToFloatColor( //
 //			((int)(255 * skeletonColor.getAlpha() * slotColor.getAlpha()) << 24) //
 //				| ((int)(255 * skeletonColor.getBlue() * slotColor.getBlue()) << 16) //
@@ -137,21 +142,79 @@ public class RegionAttachment extends Attachment
 //		vertices[C2] = color;
 //		vertices[C3] = color;
 //		vertices[C4] = color;
-
 		updateWorldVertices(slot.getBone());
 //		slot.getBone().mDebugSprite.setPosition(vertices[X1], vertices[Y1]);
 //		slot.getBone().mDebugSprite2.setPosition(vertices[X2], vertices[Y2]);
 //		slot.getBone().mDebugSprite3.setPosition(vertices[X3], vertices[Y3]);
 //		slot.getBone().mDebugSprite4.setPosition(vertices[X4], vertices[Y4]);
-			
 		batch.draw(region, 
 				vertices[X1], vertices[Y1],
 				vertices[X2], vertices[Y2],
 				vertices[X4], vertices[Y4],
 				vertices[X3], vertices[Y3],
-		1, 1, 1, 1f);
+		slotColor.getRed(), slotColor.getGreen(), slotColor.getBlue(), slotColor.getAlpha());
 	}
 
+	@Override
+	public void draw(SpriteBatch batch, Slot slot, float pX, float pY) {
+		if (region == null) throw new IllegalStateException("RegionAttachment is not resolved: " + this);
+		float[] vertices = this.vertices;	
+		updateWorldVertices(slot.getBone());
+		batch.drawWithoutChecks(region, 
+				vertices[X1]+pX, vertices[Y1]+pY,
+				vertices[X2]+pX, vertices[Y2]+pY,
+				vertices[X4]+pX, vertices[Y4]+pY,
+				vertices[X3]+pX, vertices[Y3]+pY,
+				1, 1, 1, 1);
+	}
+	 
+
+	
+	public void draw (SpriteBatch batch, Slot slot,IEntity pEntity) {
+		if (region == null) throw new IllegalStateException("RegionAttachment is not resolved: " + this);
+		Color slotColor = slot.getColor();
+		float[] vertices = this.vertices;	
+//		vertices[C1] = color;
+//		vertices[C2] = color;
+//		vertices[C3] = color;
+//		vertices[C4] = color;
+		updateWorldVertices(slot.getBone());
+//		slot.getBone().mDebugSprite.setPosition(vertices[X1], vertices[Y1]);
+//		slot.getBone().mDebugSprite2.setPosition(vertices[X2], vertices[Y2]);
+//		slot.getBone().mDebugSprite3.setPosition(vertices[X3], vertices[Y3]);
+//		slot.getBone().mDebugSprite4.setPosition(vertices[X4], vertices[Y4]);
+		final float pX = pEntity.getX();
+		final float pY  = pEntity.getY();
+		batch.drawWithoutChecks(region, 
+				vertices[X1]+pX, vertices[Y1]+pY,
+				vertices[X2]+pX, vertices[Y2]+pY,
+				vertices[X4]+pX, vertices[Y4]+pY,
+				vertices[X3]+pX, vertices[Y3]+pY,
+				slotColor.getRed(), slotColor.getGreen(), slotColor.getBlue(), slotColor.getAlpha());
+	}
+	
+	public void draw (SpriteBatch batch, Slot slot,IEntity pEntity,float pRed,float pGreen,float pBlue,float pAlpha) {
+		if (region == null) throw new IllegalStateException("RegionAttachment is not resolved: " + this);
+		float[] vertices = this.vertices;	
+//		vertices[C1] = color;
+//		vertices[C2] = color;
+//		vertices[C3] = color;
+//		vertices[C4] = color;
+		updateWorldVertices(slot.getBone());
+//		slot.getBone().mDebugSprite.setPosition(vertices[X1], vertices[Y1]);
+//		slot.getBone().mDebugSprite2.setPosition(vertices[X2], vertices[Y2]);
+//		slot.getBone().mDebugSprite3.setPosition(vertices[X3], vertices[Y3]);
+//		slot.getBone().mDebugSprite4.setPosition(vertices[X4], vertices[Y4]);
+		final float pX = pEntity.getX();
+		final float pY  = pEntity.getY();
+		batch.drawWithoutChecks(region, 
+				vertices[X1]+pX, vertices[Y1]+pY,
+				vertices[X2]+pX, vertices[Y2]+pY,
+				vertices[X4]+pX, vertices[Y4]+pY,
+				vertices[X3]+pX, vertices[Y3]+pY,
+				pRed, pGreen,pBlue,pAlpha);
+	}
+	
 	public void updateWorldVertices (Bone bone) {
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
@@ -169,8 +232,6 @@ public class RegionAttachment extends Attachment
 		vertices[Y3] = offset[4] * m10 + offset[5] * m11 + y;
 		vertices[X4] = offset[6] * m00 + offset[7] * m01 + x;
 		vertices[Y4] = offset[6] * m10 + offset[7] * m11 + y;
-		
-		
 	}
 
 	public float[] getWorldVertices () {
@@ -232,4 +293,6 @@ public class RegionAttachment extends Attachment
 	public void setHeight (float height) {
 		this.height = height;
 	}
+
+
 }

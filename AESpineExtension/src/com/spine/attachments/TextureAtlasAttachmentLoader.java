@@ -1,12 +1,12 @@
 package com.spine.attachments;
 
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-
 import android.content.Context;
 
 import com.spine.Attachment;
 import com.spine.AttachmentLoader;
 import com.spine.AttachmentType;
+
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 
 public class TextureAtlasAttachmentLoader implements AttachmentLoader {
 	private BitmapTextureAtlas atlas;

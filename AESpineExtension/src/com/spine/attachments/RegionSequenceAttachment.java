@@ -1,9 +1,9 @@
 package com.spine.attachments;
 
-import org.andengine.entity.sprite.batch.SpriteBatch;
-
-import com.MathUtils;
+import com.badlogic.gdx.utils.MathUtils;
 import com.spine.Slot;
+
+import org.andengine.entity.sprite.batch.SpriteBatch;
 
 /** Attachment that displays various texture regions over time. */
 public class RegionSequenceAttachment extends RegionAttachment {

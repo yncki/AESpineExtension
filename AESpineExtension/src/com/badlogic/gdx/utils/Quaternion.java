@@ -18,7 +18,6 @@ package com.badlogic.gdx.utils;
 
 import java.io.Serializable;
 
-import com.MathUtils;
 
 /** A simple quaternion class. See 
  * <a href="http://en.wikipedia.org/wiki/Quaternion">http://en.wikipedia.org/wiki/Quaternion</a>

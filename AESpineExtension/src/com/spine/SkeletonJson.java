@@ -1,19 +1,11 @@
 package com.spine;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.util.Log;
 
 import com.badlogic.gdx.utils.Array;
 import com.spine.Animation.AttachmentTimeline;
+import com.spine.Animation.ColorTimeline;
 import com.spine.Animation.CurveTimeline;
 import com.spine.Animation.RotateTimeline;
 import com.spine.Animation.ScaleTimeline;
@@ -24,6 +16,15 @@ import com.spine.attachments.RegionAttachment;
 import com.spine.attachments.SpineTextureRegion;
 import com.spine.attachments.TextureAtlasAttachmentLoader;
 
+import org.andengine.util.adt.color.Color;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
 public class SkeletonJson {
 	static public final String TIMELINE_SCALE = "scale";
 	static public final String TIMELINE_ROTATE = "rotate";
@@ -195,6 +196,9 @@ public class SkeletonJson {
 				//there are more entries in map eyes[eyes,eyes-closed]
 				String regionName = name;
 				JSONObject v = map.getJSONObject(regionName);
+				
+				String pRegionFilename = getString(v, "name", regionName);
+				
 				regionAttachment.setX(getFloat(v, "x", 0) * scale);
 				regionAttachment.setY(getFloat(v, "y", 0) * scale);
 				regionAttachment.setScaleX(getFloat(v, "scaleX", 1));
@@ -203,10 +207,10 @@ public class SkeletonJson {
 				regionAttachment.setWidth(getFloat(v, "width", 32) * scale);
 				regionAttachment.setHeight(getFloat(v, "height", 32) * scale);
 				regionAttachment.updateOffset();
-				SpineTextureRegion region = atlasParser.getRegion(regionName);
-				Asset pAsset = atlasParser.assets.get(regionName);
+				SpineTextureRegion region = atlasParser.getRegion(pRegionFilename);
+				Asset pAsset = atlasParser.assets.get(pRegionFilename);
 				if (pAsset==null) {
-//					throw new Exception("asset is null for region:"+regionName);
+					throw new Exception("asset is null for region:"+regionName+"->"+pRegionFilename);
 				}
 				//region.originalWidth
 				region.originalWidth = (int) pAsset.width;
@@ -217,7 +221,7 @@ public class SkeletonJson {
 				region.offsetY = pAsset.offsetY;
 				((RegionAttachment)attachment).setRegion(region);//		inside-> 		regionAttachment.updateOffset();
 				regions.add(region);
-				if (Skeleton.debug) Log.i("REGIONS","set region:"+region+" | name:"+regionName);
+				if (Skeleton.debug) Log.i("REGIONS","set region:"+region+" | name:"+regionName+", asset:"+pAsset);
 			}
 		
 		} catch (JSONException e) {
@@ -318,20 +322,46 @@ public class SkeletonJson {
 						String pAttachmentKey = pSlotAttachments.getString(j);
 						JSONArray pTimelines = pSlotData.getJSONArray(pAttachmentKey);
 						if (Skeleton.debug) Log.i("ANSLOT","loading attachment slot:"+slotName+", index:"+slotIndex+", name:"+pAttachmentKey);
+						
 						if (pAttachmentKey.equals(TIMELINE_ATTACHMENT)) {
 							AttachmentTimeline timeline = new AttachmentTimeline(pTimelines.length());	
 							timeline.setSlotIndex(slotIndex);
 							for (int keyFrameIndex = 0;keyFrameIndex<pTimelines.length();keyFrameIndex++){
 								JSONObject pTimeLineData = pTimelines.getJSONObject(keyFrameIndex);	
-									float 	dataTime = getFloat(pTimeLineData, "time", 0f);	
-									String 	dataName = getString(pTimeLineData, "name", "error");
-									timeline.setKeyframe(keyFrameIndex, dataTime, dataName);
-									if (Skeleton.debug) Log.i("ANSLOT","loading timeline: time="+dataTime+", name="+dataName+",slotname:"+slotName);
-								}
+								float 	dataTime = getFloat(pTimeLineData, "time", 0f);	
+								String 	dataName = getString(pTimeLineData, "name", "error");
+								timeline.setKeyframe(keyFrameIndex, dataTime, dataName);
+								if (Skeleton.debug) Log.i("ANSLOT","loading timeline: time="+dataTime+", name="+dataName+",slotname:"+slotName);
+							}
 							timelines.add(timeline);
 							//increase duration if needed
 							duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() - 1]);
 						}
+						
+//						if (pAttachmentKey.equals(TIMELINE_COLOR)) {
+//							ColorTimeline  timeline = new ColorTimeline(pTimelines.length());	
+//							
+//						}
+//						
+						
+						if (pAttachmentKey.equals(TIMELINE_COLOR)) {
+							ColorTimeline  timeline = new ColorTimeline(pTimelines.length());	
+							timeline.setSlotIndex(slotIndex);
+							for (int keyFrameIndex = 0;keyFrameIndex<pTimelines.length();keyFrameIndex++){
+								JSONObject pTimeLineData = pTimelines.getJSONObject(keyFrameIndex);	
+								float 	dataTime = getFloat(pTimeLineData, "time", 0f);	
+								String col = getString(pTimeLineData, "color", "");//)Color color = Color.valueOf((String)valueMap.get("color"));
+								Color color = valueOf(col);
+								timeline.setKeyframe(keyFrameIndex, dataTime, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+								readCurve(timeline, keyFrameIndex, pTimeLineData);
+//								String 	dataName = getString(pTimeLineData, "name", "error");
+//								timeline.setKeyframe(keyFrameIndex, dataTime, dataName);
+//								if (Skeleton.debug) Log.i("ANSLOT","loading timeline: time="+dataTime+", name="+dataName+",slotname:"+slotName);
+							}
+							timelines.add(timeline);
+							duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() - 1]);
+						}
+						
 						//TODO , color attachment 
 						
 						
@@ -378,7 +408,13 @@ public class SkeletonJson {
 		}  
 	}
 	
-	
+	public static Color valueOf (String hex) {
+		int r = Integer.valueOf(hex.substring(0, 2), 16);
+		int g = Integer.valueOf(hex.substring(2, 4), 16);
+		int b = Integer.valueOf(hex.substring(4, 6), 16);
+		int a = hex.length() != 8 ? 255 : Integer.valueOf(hex.substring(6, 8), 16);
+		return new Color(r / 255f, g / 255f, b / 255f, a / 255f);
+	}
 	@Deprecated
 	public Animation readAnimation (InputStream file, SkeletonData skeletonData,String pAnimationName) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");

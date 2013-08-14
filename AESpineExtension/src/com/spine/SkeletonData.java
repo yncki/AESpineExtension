@@ -130,4 +130,8 @@ public class SkeletonData {
 		    return null;
 		  }
 		
+	public Array<BoneData> getBonesData(){
+		return mBonesData;
+	}
+		  
 }

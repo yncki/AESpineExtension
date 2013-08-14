@@ -24,18 +24,19 @@
  ******************************************************************************/
 
 package com.spine;
-
-
 import org.andengine.util.adt.color.Color;
 
-import com.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.MathUtils;
 
 public class Animation {
 	
 	private String mName;
 	private final Array<Timeline> mTimelines;
 	private float mDuration;
+	public float baseSpeed = 0f;
 
 	public Animation (String pName,Array<Timeline> pTimelines, float pDuration) {
 		if (pName == null) throw new IllegalArgumentException("name cannot be null.");
@@ -403,7 +404,8 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Color color = skeleton.mSlots.get(slotIndex).color;
+
+            Color color = skeleton.mSlots.get(slotIndex).color;
 
 			if (time >= frames[frames.length - 5]) { // Time is after last frame.
 				int i = frames.length - 1;
@@ -431,9 +433,10 @@ public class Animation {
 			float a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent;
 			//TODO recheck , implementation is good 
 //			if (alpha < 1)
-//				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+//				color
+//				color.add((r - color.getRed()) * alpha, (g - color.getGreen()) * alpha, (b - color.getBlue()) * alpha, (a - color.getAlpha()) * alpha);
 //			else
-//				color.set(r, g, b, a);
+			color.set(r, g, b, a);
 		}
 	}
 

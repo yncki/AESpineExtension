@@ -1,22 +1,25 @@
 package com.spine;
 
-import org.andengine.entity.sprite.batch.SpriteBatch;
-import org.andengine.util.adt.color.Color;
+import android.util.Log;
 
 import com.badlogic.gdx.utils.Array;
 
+import org.andengine.entity.IEntity;
+import org.andengine.entity.sprite.batch.SpriteBatch;
+import org.andengine.util.adt.color.Color;
 public class Skeleton {
 	
 	public static boolean debug = false;
 	
-	final SkeletonData mData;
-	final Array<Bone> mBones;
-	final Array<Slot> mSlots;
-	final Array<Slot> mDrawOrder;
+
+	final protected SkeletonData mData;
+	final protected Array<Bone> mBones;
+	final protected Array<Slot> mSlots;
+	final protected Array<Slot> mDrawOrder;
 	Skin mSkin;
-	final Color mColor;
-	float mTime;
-	boolean flipX, flipY;
+	final protected Color mColor;
+	protected float mTime;
+	protected boolean flipX, flipY;
 
 	public Skeleton (SkeletonData data) {	
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -100,6 +103,38 @@ public class Skeleton {
 			Attachment attachment = slot.attachment;
 			if (attachment != null) {
 				attachment.draw(batch, slot);
+//                if (slot.toString().equalsIgnoreCase("ogienA"))
+//                    Log.i("COLOR","slot:"+slot+", color :"+slot.color+", datacolor :"+slot.data.color);
+
+			}
+		}
+		
+		if (debug){
+			drawDebug();
+		}
+	}
+	public void drawAtPosition (SpriteBatch batch,IEntity pEntity) {
+		Array<Slot> drawOrder = this.mDrawOrder;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrder.get(i);
+			Attachment attachment = slot.attachment;
+			if (attachment != null) {
+				attachment.draw(batch, slot,pEntity);
+			}
+		}
+		
+		if (debug){
+			drawDebug();
+		}
+	}
+
+	public void drawAtPosition (SpriteBatch batch,IEntity pEntity,float pRed,float pGreen,float pBlue,float pAlpha) {
+		Array<Slot> drawOrder = this.mDrawOrder;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrder.get(i);
+			Attachment attachment = slot.attachment;
+			if (attachment != null) {
+				attachment.draw(batch, slot,pEntity,pRed,pGreen,pBlue,pAlpha);
 			}
 		}
 		
@@ -108,7 +143,23 @@ public class Skeleton {
 		}
 	}
 	
-
+	public void drawAtPosition (SpriteBatch batch,float pX,float pY) {
+		Array<Slot> drawOrder = this.mDrawOrder;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrder.get(i);
+			Attachment attachment = slot.attachment;
+			if (attachment != null) {
+				attachment.draw(batch, slot,pX,pY);
+			}
+		}
+		
+		if (debug){
+			drawDebug();
+		}
+	}
+	
+	
+	
 	private void drawDebug () {
 		for (int i = 0, n = mBones.size; i < n; i++) {
 			Bone bone = mBones.get(i);

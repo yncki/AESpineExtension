@@ -1,5 +1,6 @@
 package com.spine;
 
+import org.andengine.entity.IEntity;
 import org.andengine.entity.sprite.batch.SpriteBatch;
 
 abstract public class Attachment {
@@ -12,7 +13,7 @@ abstract public class Attachment {
 	}
 
 	abstract public void draw (SpriteBatch batch, Slot slot);
-
+	abstract public void draw (SpriteBatch batch, Slot slot,IEntity pEntity);
 	public String getName () {
 		return name;
 	}
@@ -20,4 +21,7 @@ abstract public class Attachment {
 	public String toString () {
 		return name;
 	}
+
+	abstract public void draw(SpriteBatch batch, Slot slot, float pX, float pY);
+	abstract public void draw(SpriteBatch batch, Slot slot, IEntity pEntity,float pRed, float pGreen, float pBlue,float pAplha);
 }

@@ -1,10 +1,10 @@
 package com.spine;
 
+import com.badlogic.gdx.utils.MathUtils;
+import com.badlogic.gdx.utils.Matrix3;
+
 import org.andengine.entity.primitive.Line;
 import org.andengine.entity.primitive.Rectangle;
-
-import com.MathUtils;
-import com.badlogic.gdx.utils.Matrix3;
 
 public class Bone {
 	final BoneData data;

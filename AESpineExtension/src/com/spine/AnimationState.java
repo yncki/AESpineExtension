@@ -39,10 +39,27 @@ public class AnimationState {
 		this.data = data;
 	}
 
+	public void update (float delta,float pInputFactor) {
+		float pP = 1;
+		float pC = 1;
+		if (pInputFactor>0){
+			if (previous!=null&&previous.baseSpeed!=0) pP = pInputFactor / previous.baseSpeed;
+			if (current!=null&&current.baseSpeed!=0) pC = pInputFactor / current.baseSpeed;
+		}
+		currentTime += delta*pC;
+		previousTime += delta*pP;
+		mixTime += delta*pC;//*pC*pP;
+	}
+	
 	public void update (float delta) {
-		currentTime += delta;
-		previousTime += delta;
-		mixTime += delta;
+	
+//		if (pInputVelocity>0){
+//			if (previous!=null&&previous.baseSpeed!=0) pP = pInputVelocity / previous.baseSpeed;
+//			if (current!=null&&current.baseSpeed!=0) pC = pInputVelocity / current.baseSpeed;
+//		}
+		currentTime += delta;//*pC;
+		previousTime += delta;//*pP;
+		mixTime += delta;//*pC;//*pC*pP;
 	}
 
 	public void apply (Skeleton skeleton) {

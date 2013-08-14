@@ -1,23 +1,24 @@
 package com.spine;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
+import android.content.Context;
+import android.util.Log;
+
+import com.spine.attachments.SpineTextureRegion;
 
 import org.andengine.opengl.texture.TextureManager;
+import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.bitmap.BitmapTextureFormat;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.util.debug.Debug;
 
-import com.spine.attachments.SpineTextureRegion;
-
-import android.content.Context;
-import android.util.Log;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
 
 public class AtlasParser
 {
@@ -34,6 +35,7 @@ public class AtlasParser
 	
 	private BitmapTextureAtlas mBitmapTextureAtlas;
 	private TextureRegion mTextureRegion;
+	private String mBitmapDirectory;
 	
 	public static final String ATTR_FORMAT = "format";
 	public static final String ATTR_FILTER = "filter";
@@ -45,16 +47,16 @@ public class AtlasParser
 	public static final String ATTR_OFFSET = "offset";
 	public static final String ATTR_INDEX = "index";
 	
-	public AtlasParser(InputStream in, TextureManager pTextureManager,int pTextureWidth,int pTextureHeight, Context pContext)
+	public AtlasParser(InputStream in, TextureManager pTextureManager,int pTextureWidth,int pTextureHeight, Context pContext,String pBitmapDirectory,TextureOptions pTextureOptions)
 	{
 		textureManager = pTextureManager;
 		context = pContext;
-		
-		this.read(in,pTextureWidth,pTextureHeight);
+		mBitmapDirectory = pBitmapDirectory;
+		this.read(in,pTextureWidth,pTextureHeight,pTextureOptions);
 		
 	}
 	
-	private void read(InputStream in,int pTextureWidth,int pTextureHeight) {
+	private void read(InputStream in,int pTextureWidth,int pTextureHeight,TextureOptions pTextureOptions) {
 		InputStreamReader input;
 		try {
 			//input = new FileReader(path);
@@ -96,7 +98,7 @@ public class AtlasParser
 				    	final String index = array[1].trim();
 				    	asset.setIndex(index);
 				    } else {
-				    	Debug.d("missing property: " + key);
+//				    	Debug.d("missing property: " + key);
 				    }
 				} else if(line == 1) {
 					file = myLine.trim();
@@ -113,7 +115,7 @@ public class AtlasParser
 			
 			bufRead.close();
 			
-			this.createAtlas(pTextureWidth,pTextureHeight);
+			this.createAtlas(pTextureWidth,pTextureHeight,pTextureOptions);
 			this.createRegions();
 		
 		} catch (FileNotFoundException e) {
@@ -123,9 +125,9 @@ public class AtlasParser
 		}
 	}
 	
-	private void createAtlas(int pTextureWidth,int pTextureHeight) {
-		this.mBitmapTextureAtlas = new BitmapTextureAtlas(textureManager, pTextureWidth, pTextureHeight, BitmapTextureFormat.RGBA_8888);
-		this.mTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, context, file, 0, 0);
+	private void createAtlas(int pTextureWidth,int pTextureHeight,TextureOptions pTextureOptions) {
+		this.mBitmapTextureAtlas = new BitmapTextureAtlas(textureManager, pTextureWidth, pTextureHeight, BitmapTextureFormat.RGBA_8888,pTextureOptions);
+		this.mTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, context, mBitmapDirectory+file, 0, 0);
 		this.mBitmapTextureAtlas.load();
 	}
 	
@@ -133,7 +135,8 @@ public class AtlasParser
 		for(Asset asset : assets.values()) {
 			SpineTextureRegion region = new SpineTextureRegion(asset.name,mBitmapTextureAtlas, asset.x, asset.y, asset.width, asset.height, 1, asset.rotate);
 			regions.put(asset.name, region);
-			if (Skeleton.debug) Log.i("REGION","CREATING REGION:"+asset.name);
+			if (Skeleton.debug)
+				Log.i("REGIONCREATE","CREATING REGION:"+asset.name);
 		}
 	}
 	

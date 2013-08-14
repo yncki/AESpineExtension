@@ -1,12 +1,12 @@
 package com.spine;
 
 public class BoneData {
-	final BoneData parent;
-	final String name;
-	float length;
-	float x, y;
-	float rotation;
-	float scaleX = 1, scaleY = 1;
+	public final BoneData parent;
+	public final String name;
+	public float length;
+	public float x, y;
+	public float rotation;
+	public float scaleX = 1, scaleY = 1;
 
 	/** @param parent May be null. */
 	public BoneData (String name, BoneData parent) {

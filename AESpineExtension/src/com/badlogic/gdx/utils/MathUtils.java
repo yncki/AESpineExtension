@@ -14,11 +14,10 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com;
+package com.badlogic.gdx.utils;
 
 import java.util.Random;
 
-import com.badlogic.gdx.utils.NumberUtils;
 
 /** Utility and fast math functions.
  * <p>

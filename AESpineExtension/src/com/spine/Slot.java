@@ -1,6 +1,9 @@
 package com.spine;
 
+import android.util.Log;
+
 import org.andengine.util.adt.color.Color;
+
 
 public class Slot {
 	
@@ -10,7 +13,7 @@ public class Slot {
 	
 	private final Skeleton skeleton;
 	
-	final Color color;
+	  Color color;
 	
 	Attachment attachment;
 	
@@ -46,6 +49,12 @@ public class Slot {
 		attachment = slot.attachment;
 		attachmentTime = slot.attachmentTime;
 	}
+
+    public void setColor(float r,float g,float b){
+        color.set(r,g,b);
+//        if (this.toString().equalsIgnoreCase("ogienA"))
+//            Log.i("COLOR", "setting slot:" + this + ", color :" + this.color + ", datacolor :" + this.data.color);
+    }
 
 	public SlotData getData () {
 		return data;
